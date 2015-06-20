@@ -11,7 +11,7 @@ OPTION(IWINFO_SUPPORT "libiwinfo plugin support" ON)
 
 SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
-INCLUDE_DIRECTORIES(/opt/local/include ../ ../ubus ../uci ../json-c-0.11)
+INCLUDE_DIRECTORIES(/opt/local/include ../ ../ubus ../uci ../json-c)
 LINK_DIRECTORIES(/opt/local/lib ../lib )
 
 CHECK_FUNCTION_EXISTS(getspnam HAVE_SHADOW)
