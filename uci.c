@@ -1129,6 +1129,7 @@ rpc_uci_trigger_event(struct ubus_context *ctx, const char *config)
 	uint32_t id;
 	memset(&b, 0, sizeof(struct blob_buf)); 
 
+	// this will send change event to procd (this is how services are reloaded by procd)
 	if (!ubus_lookup_id(ctx, "service", &id)) {
 		void *c;
 
@@ -1140,7 +1141,12 @@ rpc_uci_trigger_event(struct ubus_context *ctx, const char *config)
 		ubus_invoke(ctx, id, "event", b.head, NULL, 0, 1000);
 		blob_buf_free(&b); 
 	}
-	
+
+	// send a normal ubus event signalling that this config has been changed
+	blob_buf_init(&buf, 0);
+	blobmsg_add_string(&buf, "config", config); 
+	ubus_send_event(ctx, "uci.commit", buf.head); 
+
 	free(pkg);
 }
 
@@ -1157,6 +1163,7 @@ static void rpc_ubus_send_change_event(struct ubus_context *ctx, const char *con
 	// Disable events for now because it causes procd to leak memory upon uci commit (CC seems to have fixed this).  
 	// We are not really using this functionality right now.
 	// TODO: uncomment when this function is needed again
+	// NOTE: procd memory leak now fixed by felix. We still keep this commented for now because it currently reveals too much information about changes being made. 
 	//ubus_send_event(ctx, "uci.commit", buf.head); 
 }
 static int
